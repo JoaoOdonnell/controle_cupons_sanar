@@ -1,0 +1,3 @@
+([('controle_cupons_sanar',
+   '/Users/joaotalaiaodonnellneto/Projetos/Python/Cupons_Novo/dist/controle_cupons_sanar',
+   'EXECUTABLE')],)
