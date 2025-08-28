@@ -1,0 +1,14 @@
+# Evita arquivos e pastas desnecessárias no GitHub
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.spec
+*.log
+*.sqlite3
+*.db
+venv/
+dist/
+build/
+*.xlsx
