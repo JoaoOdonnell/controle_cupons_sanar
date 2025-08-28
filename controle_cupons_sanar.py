@@ -1,9 +1,15 @@
+import sys
+import os
+
+def caminho_recurso(nome_arquivo):
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, nome_arquivo)
+    return nome_arquivo
 from customtkinter import CTkFont
 import customtkinter as ctk
 from CTkMessagebox import CTkMessagebox
 from customtkinter import CTkComboBox as ttk_ComboBox
 from openpyxl import Workbook, load_workbook
-import os
 from datetime import datetime
 import csv
 import matplotlib.pyplot as plt
@@ -26,27 +32,27 @@ INDUSTRIAS_CADASTRADAS = []
 
 def carregar_lojas():
     if os.path.exists(LOJAS_CSV):
-        with open(LOJAS_CSV, newline='', encoding='utf-8') as csvfile:
+        with open(caminho_recurso(LOJAS_CSV), newline='', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 if row:  # evita linhas vazias
                     LOJAS_CADASTRADAS.append(row[0])
         LOJAS_CADASTRADAS.sort()
     else:
-        with open(LOJAS_CSV, mode='w', newline='', encoding='utf-8') as csvfile:
+        with open(caminho_recurso(LOJAS_CSV), mode='w', newline='', encoding='utf-8') as csvfile:
             pass  # cria o arquivo se não existir
 
 
 def carregar_industrias():
     if os.path.exists(INDUSTRIAS_CSV):
-        with open(INDUSTRIAS_CSV, newline='', encoding='utf-8') as csvfile:
+        with open(caminho_recurso(INDUSTRIAS_CSV), newline='', encoding='utf-8') as csvfile:
             reader = csv.reader(csvfile)
             for row in reader:
                 if row:  # evita linhas vazias
                     INDUSTRIAS_CADASTRADAS.append(row[0])
         INDUSTRIAS_CADASTRADAS.sort()
     else:
-        with open(INDUSTRIAS_CSV, mode='w', newline='', encoding='utf-8') as csvfile:
+        with open(caminho_recurso(INDUSTRIAS_CSV), mode='w', newline='', encoding='utf-8') as csvfile:
             pass  # cria o arquivo se não existir
 
 
@@ -65,7 +71,7 @@ def abrir_dashboard():
             title="Erro", message="Arquivo de cupons não encontrado.", icon="cancel")
         return
 
-    wb = load_workbook(EXCEL_FILE)
+    wb = load_workbook(caminho_recurso(EXCEL_FILE))
     ws = wb["Cupons"]
 
     # Carregar todos os cupons
@@ -231,7 +237,7 @@ def criar_planilha_se_necessario():
         ws.title = "Cupons"
         ws.append(["Loja", "Indústria", "Valor da Compra (R$)",
                   "Quantidade de Cupons", "Data e Hora"])
-        wb.save(EXCEL_FILE)
+        wb.save(caminho_recurso(EXCEL_FILE))
 
 # Função chamada ao clicar no botão "Registrar"
 
@@ -283,11 +289,11 @@ def registrar_cupom():
 
     # Adiciona ao Excel
     criar_planilha_se_necessario()
-    wb = load_workbook(EXCEL_FILE)
+    wb = load_workbook(caminho_recurso(EXCEL_FILE))
     ws = wb.active
     ws.append([loja, industria, valor, cupons, data_hora])
     try:
-        wb.save(EXCEL_FILE)
+        wb.save(caminho_recurso(EXCEL_FILE))
     except PermissionError:
         CTkMessagebox(title="Erro", message="Não foi possível salvar a planilha. Feche o arquivo 'cupons_sanar.xlsx' se ele estiver aberto no Excel e tente novamente.", icon="cancel")
         return
@@ -356,7 +362,7 @@ def registrar_cupom():
     ws_totais.append(["Total Geral de Cupons", total_cupons_geral])
 
     try:
-        wb.save(EXCEL_FILE)
+        wb.save(caminho_recurso(EXCEL_FILE))
     except PermissionError:
         CTkMessagebox(title="Erro", message="Não foi possível salvar a planilha. Feche o arquivo 'cupons_sanar.xlsx' se ele estiver aberto no Excel e tente novamente.", icon="cancel")
         return
@@ -388,7 +394,7 @@ def excluir_cupom():
             title="Erro", message="Arquivo de cupons não encontrado.", icon="cancel")
         return
 
-    wb = load_workbook(EXCEL_FILE)
+    wb = load_workbook(caminho_recurso(EXCEL_FILE))
     ws = wb.active
     linhas_para_remover = []
 
@@ -464,7 +470,7 @@ def excluir_cupom():
     ws_totais.append(["Total Geral de Cupons", total_cupons_geral])
 
     try:
-        wb.save(EXCEL_FILE)
+        wb.save(caminho_recurso(EXCEL_FILE))
     except PermissionError:
         CTkMessagebox(title="Erro", message="Não foi possível salvar a planilha. Feche o arquivo 'cupons_sanar.xlsx' se ele estiver aberto no Excel e tente novamente.", icon="cancel")
         return
@@ -569,7 +575,7 @@ def abrir_tela_consulta():
     frame_filtros = ctk.CTkFrame(consulta_main_frame)
     frame_filtros.pack(fill="x", pady=10)
 
-    wb = load_workbook(EXCEL_FILE)
+    wb = load_workbook(caminho_recurso(EXCEL_FILE))
     ws = wb["Cupons"]
 
     lojas_disponiveis = sorted(
@@ -688,7 +694,7 @@ def abrir_tela_consulta():
         elements = [Paragraph("Relatório de Cupons Filtrados",
                               styles['Heading1']), Spacer(1, 12)]
         # Inserir logo centralizada no topo, se existir
-        logo_path = "logo_sanar.png"
+        logo_path = caminho_recurso("logo_sanar.png")
         if os.path.exists(logo_path):
             logo = Image(logo_path, width=100, height=50)
             logo.hAlign = 'CENTER'
@@ -754,7 +760,7 @@ def abrir_tela_consulta():
             CTkMessagebox(
                 title="Erro", message="Arquivo de cupons não encontrado.", icon="cancel")
             return
-        wb = load_workbook(EXCEL_FILE)
+        wb = load_workbook(caminho_recurso(EXCEL_FILE))
         ws = wb["Cupons"]
         for i, row in enumerate(ws.iter_rows(min_row=2), start=2):
             loja_cell = str(row[0].value).strip()
@@ -770,7 +776,7 @@ def abrir_tela_consulta():
                 and data_cell == str(dados[4]).strip()
             ):
                 ws.delete_rows(i)
-                wb.save(EXCEL_FILE)
+                wb.save(caminho_recurso(EXCEL_FILE))
                 wb.close()
                 wb = load_workbook(EXCEL_FILE)
                 ws = wb["Cupons"]
@@ -807,7 +813,7 @@ def abrir_tela_cadastro():
     def salvar_loja():
         nova_loja = nova_loja_entry.get().strip()
         if nova_loja and nova_loja not in LOJAS_CADASTRADAS:
-            with open(LOJAS_CSV, "a", newline="", encoding="utf-8") as f:
+            with open(caminho_recurso(LOJAS_CSV), "a", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow([nova_loja])
             LOJAS_CADASTRADAS.append(nova_loja)
@@ -827,7 +833,7 @@ def abrir_tela_cadastro():
     def salvar_industria():
         nova_ind = nova_ind_entry.get().strip()
         if nova_ind and nova_ind not in INDUSTRIAS_CADASTRADAS:
-            with open(INDUSTRIAS_CSV, "a", newline="", encoding="utf-8") as f:
+            with open(caminho_recurso(INDUSTRIAS_CSV), "a", newline="", encoding="utf-8") as f:
                 writer = csv.writer(f)
                 writer.writerow([nova_ind])
             INDUSTRIAS_CADASTRADAS.append(nova_ind)
