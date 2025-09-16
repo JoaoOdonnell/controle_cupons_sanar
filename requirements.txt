@@ -1,0 +1,6 @@
+pandas
+matplotlib
+reportlab
+openpyxl
+customtkinter
+ctkmessagebox
